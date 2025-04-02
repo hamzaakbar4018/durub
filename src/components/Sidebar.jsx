@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Settings, User, Calendar, Clock } from 'lucide-react';
+import { Settings, User, Calendar, Clock, MessageCircle } from 'lucide-react';
 
 const Sidebar = ({ isopen }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -12,12 +12,10 @@ const Sidebar = ({ isopen }) => {
 
   return (
     <div
-    
       className={`bg-white border-l border-gray-200 w-64 h-full fixed right-0 top-0 flex flex-col transition-all duration-300 z-10 ${
         isopen ? 'translate-x-0' : 'translate-x-full'
       }`}
     >
-        
       {/* User profile */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex flex-col items-center">
@@ -91,6 +89,7 @@ const Sidebar = ({ isopen }) => {
         </ul>
       </nav>
 
+      {/* Settings */}
       <div className="p-4 border-t border-gray-200">
         <button className="flex items-center w-full py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors">
           <Settings className="h-5 w-5 ml-3 text-gray-500" />

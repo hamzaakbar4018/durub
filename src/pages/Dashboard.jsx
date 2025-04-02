@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { MessageCircle } from 'lucide-react';
 
 const Dashboard = () => {
   const [motivationalText, setMotivationalText] = useState('');
@@ -17,7 +18,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-center h-full">
+    <div className="relative flex items-center justify-center h-full">
       <div className="text-center p-8 max-w-4xl">
         <h1 className="text-3xl font-bold mb-4">Welcome to Durub Alriyada</h1>
         <p className="text-xl mb-6">{motivationalText}</p>
@@ -36,6 +37,8 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      
+     
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { Menu, X, MessageCircle } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 
@@ -28,10 +28,15 @@ const Layout = () => {
         <main className="flex-1 overflow-y-auto bg-gray-100 p-6">
           <Outlet />
         </main>
-
-        <div className="fixed bottom-6 left-6 bg-green-500 text-white rounded-full p-3 shadow-lg cursor-pointer hover:bg-green-600 transition-colors">
-          <MessageCircle className="h-6 w-6" />
-        </div>
+        <a
+          href="https://api.whatsapp.com/send?phone=966534416844"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <div className="fixed bottom-6 left-6 bg-green-500 text-white rounded-full p-3 shadow-lg cursor-pointer hover:bg-green-600 transition-colors">
+            <MessageCircle className="h-6 w-6" />
+          </div>
+        </a>
       </div>
     </div>
   );

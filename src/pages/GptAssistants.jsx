@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, MessageCircle, ExternalLink } from 'lucide-react';
 
 const GptAssistants = () => {
   // Sample data
@@ -9,47 +9,53 @@ const GptAssistants = () => {
       name: "Financial Advisor", 
       description: "Get professional advice on investments and financial planning", 
       category: "Finance", 
-      image: "/api/placeholder/80/80" 
+      image: "/api/placeholder/80/80",
+      externalUrl: "https://chat.openai.com/g/g-abcdefg"
     },
     { 
       id: 2, 
       name: "Fitness Coach", 
       description: "Personal training and nutrition guidance tailored to your goals", 
       category: "Health", 
-      image: "/api/placeholder/80/80" 
+      image: "/api/placeholder/80/80",
+      externalUrl: "https://chat.openai.com/g/g-hijklmn" 
     },
     { 
       id: 3, 
       name: "Language Tutor", 
       description: "Learn any language with personalized lessons and practice", 
       category: "Education", 
-      image: "/api/placeholder/80/80" 
+      image: "/api/placeholder/80/80",
+      externalUrl: "https://chat.openai.com/g/g-opqrstu" 
     },
     { 
       id: 4, 
       name: "Travel Planner", 
       description: "Create customized travel itineraries for any destination", 
       category: "Travel", 
-      image: "/api/placeholder/80/80" 
+      image: "/api/placeholder/80/80",
+      externalUrl: "https://chat.openai.com/g/g-vwxyz12" 
     },
     { 
       id: 5, 
       name: "Code Reviewer", 
       description: "Get expert feedback on your code and implementation", 
       category: "Development", 
-      image: "/api/placeholder/80/80" 
+      image: "/api/placeholder/80/80",
+      externalUrl: "https://chat.openai.com/g/g-345678a" 
     },
     { 
       id: 6, 
       name: "Legal Assistant", 
       description: "Get help with legal document preparation and research", 
       category: "Legal", 
-      image: "/api/placeholder/80/80" 
+      image: "/api/placeholder/80/80",
+      externalUrl: "https://chat.openai.com/g/g-9bcdefg" 
     }
   ];
 
   return (
-    <div>
+    <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">GPT Assistants</h2>
         <div className="flex space-x-4">
@@ -81,13 +87,21 @@ const GptAssistants = () => {
                 </div>
               </div>
               <p className="text-gray-600 mb-4">{gpt.description}</p>
-              <button className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg">
+              <a 
+                href={gpt.externalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg flex items-center justify-center"
+              >
                 Go to Assistant
-              </button>
+                <ExternalLink className="w-4 h-4 ml-2" />
+              </a>
             </div>
           </div>
         ))}
       </div>
+      
+      
     </div>
   );
 };
