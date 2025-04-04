@@ -12,12 +12,16 @@ const Layout = () => {
 
   return (
     <div className="flex h-screen bg-gray-100" dir="rtl">
-      <Sidebar isopen={sidebarOpen} />
+      <Sidebar isopen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'mr-64' : 'mr-0'}`}>
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'md:mr-64' : 'mr-0'}`}>
         <header className="bg-white shadow-sm z-10">
           <div className="px-4 py-3 flex justify-between items-center">
-            <button onClick={toggleSidebar} className="p-2 rounded-md hover:bg-gray-200">
+            <button 
+              id="sidebar-toggle"
+              onClick={toggleSidebar} 
+              className="p-2 rounded-md hover:bg-gray-200"
+            >
               {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
             <h1 className="text-xl font-semibold text-gray-800">Durub Alriyada</h1>
@@ -28,6 +32,7 @@ const Layout = () => {
         <main className="flex-1 overflow-y-auto bg-gray-100 p-6">
           <Outlet />
         </main>
+        
         <a
           href="https://api.whatsapp.com/send?phone=966534416844"
           target="_blank"

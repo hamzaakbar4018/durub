@@ -1,8 +1,7 @@
 import React from 'react';
-import { Search, Filter, MessageCircle, ExternalLink } from 'lucide-react';
-
+import { Search, Filter, ExternalLink } from 'lucide-react';
+import img from '../assets/react.svg'
 const GptAssistants = () => {
-  // Sample data
   const gptAssistants = [
     { 
       id: 1, 
@@ -55,16 +54,16 @@ const GptAssistants = () => {
   ];
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">GPT Assistants</h2>
-        <div className="flex space-x-4">
-          <div className="relative">
+    <div className="container mx-auto px-4 sm:px-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold">GPT Assistants</h2>
+        <div className="flex flex-wrap gap-4 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
             <Search className="absolute right-3 top-3 text-gray-400 w-5 h-5" />
             <input
               type="text"
               placeholder="Search assistants..."
-              className="pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full sm:w-auto pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#26f4a8]"
             />
           </div>
           <button className="bg-gray-200 hover:bg-gray-300 p-2 rounded-lg">
@@ -77,11 +76,11 @@ const GptAssistants = () => {
         {gptAssistants.map(gpt => (
           <div key={gpt.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
             <div className="p-4">
-              <div className="flex items-center mb-4">
-                <img src={gpt.image} alt={gpt.name} className="w-12 h-12 rounded-full ml-4" />
+              <div className="flex gap-2 items-center mb-4">
+                <img src={img} alt={gpt.name} className="w-10 h-10 rounded-full mr-4" />
                 <div>
                   <h3 className="font-bold text-lg">{gpt.name}</h3>
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                  <span className="bg-green-100 text-[#26f4a8] text-xs px-2 py-1 rounded-full">
                     {gpt.category}
                   </span>
                 </div>
@@ -91,7 +90,7 @@ const GptAssistants = () => {
                 href={gpt.externalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg flex items-center justify-center"
+                className="w-full bg-[#26f4a8] hover:bg-green-400 text-white py-2 rounded-lg flex items-center justify-center"
               >
                 Go to Assistant
                 <ExternalLink className="w-4 h-4 ml-2" />
@@ -100,8 +99,6 @@ const GptAssistants = () => {
           </div>
         ))}
       </div>
-      
-      
     </div>
   );
 };
