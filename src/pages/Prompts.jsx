@@ -370,7 +370,7 @@ const Prompts = () => {
                 </div>
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-bold text-lg">{prompt.title}</h3>
-                  <span className="bg-green-100 text-[#26f4a8] text-xs px-2 py-1 rounded-full mt-1 ml-2">
+                  <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mt-1 ml-2">
                     {prompt.category}
                   </span>
                 </div>
@@ -492,7 +492,7 @@ const Prompts = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
               <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-0">{selectedPrompt.title}</h2>
               <div className="flex gap-2 items-center">
-                <span className="bg-green-100 text-[#26f4a8] text-xs px-2 py-1 rounded-full mr-2">
+                <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mr-2">
                   {selectedPrompt.category}
                 </span>
                 <button
@@ -585,7 +585,7 @@ const Prompts = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
               <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-0">{selectedPrompt.title}</h2>
               <div className="flex gap-2 items-center">
-                <span className="bg-green-100 text-[#26f4a8] text-xs px-2 py-1 rounded-full mr-2">
+                <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mr-2">
                   {selectedPrompt.category}
                 </span>
                 <button
@@ -690,7 +690,7 @@ const Prompts = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
               <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-0">{selectedPrompt.title}</h2>
               <div className="flex gap-2 items-center">
-                <span className="bg-green-100 text-[#26f4a8] text-xs px-2 py-1 rounded-full mr-2">
+                <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mr-2">
                   {selectedPrompt.category}
                 </span>
                 <button

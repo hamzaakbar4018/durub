@@ -76,7 +76,7 @@ const Favorites = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-8 rtl">
+    <div className="container mx-auto md:px-4 sm:px-6 py-8 rtl">
       <h1 className="text-2xl sm:text-3xl font-bold mb-6">المفضلة</h1>
 
       {/* Search and filters */}
@@ -145,7 +145,7 @@ const Favorites = () => {
 
               <div className="flex justify-between items-start mb-2">
                 <h3 className="font-bold text-lg">{prompt.title}</h3>
-                <span className="bg-green-100 text-[#26f4a8] text-xs px-2 py-1 rounded-full mt-1 ml-2">
+                <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mt-1 ml-2">
                   {prompt.category}
                 </span>
               </div>
