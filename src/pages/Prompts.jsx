@@ -1,10 +1,13 @@
+"use client"
+
 import { useState } from "react"
-import { Search, Filter, Plus, Copy, ArrowLeft, Heart, Star } from "lucide-react"
+import { Search, Filter, Plus, Copy, ArrowLeft, Heart, Star, Lock } from "lucide-react"
 import CategoryFilter from "../components/CategoryFilter"
-import chatgpt from '../assets/chatgpt.png'
-import gemini from '../assets/gemini.png'
-import midhourney from '../assets/midjourney.png'
-import claude from '../assets/claude.png'
+import chatgpt from "../assets/chatgpt.png"
+import gemini from "../assets/gemini.png"
+import midhourney from "../assets/midjourney.png"
+import claude from "../assets/claude.png"
+import { IoSparklesSharp } from "react-icons/io5"
 
 const Prompts = () => {
   const [selectedPrompt, setSelectedPrompt] = useState(null)
@@ -36,7 +39,7 @@ const Prompts = () => {
     { id: "cyberpunk", name: "Cyberpunk" },
   ]
 
-  // Sample data for prompts
+  // Sample data for prompts with added subscription requirement
   const allPrompts = [
     {
       id: 1,
@@ -50,6 +53,7 @@ const Prompts = () => {
         { id: "projectName", label: "Project Name", example: "Durub AlRiyada", type: "text" },
         { id: "branchCount", label: "Number of Branches", example: "3", type: "number" },
       ],
+      subscriptionRequired: "premium", 
     },
     {
       id: 2,
@@ -62,6 +66,7 @@ const Prompts = () => {
         { id: "productName", label: "Product Name", example: "FitTrack Pro", type: "text" },
         { id: "targetMarket", label: "Target Market", example: "Saudi Arabia", type: "text" },
       ],
+      subscriptionRequired: null, // Added subscription requirement
     },
     {
       id: 3,
@@ -74,6 +79,7 @@ const Prompts = () => {
         { id: "industryType", label: "Industry Type", example: "Fitness", type: "text" },
         { id: "topicFocus", label: "Topic Focus", example: "Home Workouts", type: "text" },
       ],
+      subscriptionRequired: null, // Free product
     },
     {
       id: 4,
@@ -87,6 +93,7 @@ const Prompts = () => {
         { id: "platformName", label: "Platform Name", example: "Instagram", type: "text" },
         { id: "contentTheme", label: "Content Theme", example: "Fitness Tips", type: "text" },
       ],
+      subscriptionRequired: "premium", // Added subscription requirement
     },
     {
       id: 5,
@@ -96,6 +103,7 @@ const Prompts = () => {
       platform: "Gemini",
       code: "Write a compelling product description for AirFlex Mat, a Yoga Mat priced at 199 SAR. Focus on benefits, features, and include a call to action.",
       inputs: [],
+      subscriptionRequired: null, // Free product
     },
     {
       id: 6,
@@ -108,6 +116,7 @@ const Prompts = () => {
         { id: "businessName", label: "Business Name", example: "Durub AlRiyada", type: "text" },
         { id: "newsletterTopic", label: "Newsletter Topic", example: "Monthly Fitness Challenge", type: "text" },
       ],
+      subscriptionRequired: "basic", // Added subscription requirement
     },
     {
       id: 7,
@@ -125,6 +134,7 @@ const Prompts = () => {
           options: designStyles.map((style) => style.name),
         },
       ],
+      subscriptionRequired: "premium", // Added subscription requirement
     },
     {
       id: 8,
@@ -144,6 +154,7 @@ const Prompts = () => {
           options: designStyles.map((style) => style.name),
         },
       ],
+      subscriptionRequired: "premium", // Added subscription requirement
     },
     {
       id: 9,
@@ -153,6 +164,7 @@ const Prompts = () => {
       platform: "Gemini",
       code: "Create a comprehensive data analysis report for quarterly sales data, including trend analysis, key insights, and visual representation recommendations.",
       inputs: [],
+      subscriptionRequired: null, // Free product
     },
   ]
 
@@ -171,16 +183,16 @@ const Prompts = () => {
   const filteredPrompts =
     searchQuery || selectedCategory !== "all"
       ? prompts.filter((prompt) => {
-        const matchesSearch =
-          searchQuery === "" ||
-          prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          prompt.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          prompt.category.toLowerCase().includes(searchQuery.toLowerCase())
+          const matchesSearch =
+            searchQuery === "" ||
+            prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            prompt.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            prompt.category.toLowerCase().includes(searchQuery.toLowerCase())
 
-        const matchesCategory = selectedCategory === "all" || prompt.category === selectedCategory
+          const matchesCategory = selectedCategory === "all" || prompt.category === selectedCategory
 
-        return matchesSearch && matchesCategory
-      })
+          return matchesSearch && matchesCategory
+        })
       : prompts
 
   // Add a function to handle category selection
@@ -189,13 +201,21 @@ const Prompts = () => {
   }
 
   const handlePromptClick = (prompt) => {
-    setSelectedPrompt(prompt)
-    // Initialize inputs
-    const initialInputs = {}
-    prompt.inputs.forEach((input) => {
-      initialInputs[input.id] = ""
-    })
-    setUserInputs(initialInputs)
+    // Only allow interaction with free products or products the user has access to
+    // For UI demo purposes, we're just checking if subscriptionRequired is null
+    // In a real app, this would check against the user's actual subscription
+    if (prompt.subscriptionRequired === null) {
+      setSelectedPrompt(prompt)
+      // Initialize inputs
+      const initialInputs = {}
+      prompt.inputs.forEach((input) => {
+        initialInputs[input.id] = ""
+      })
+      setUserInputs(initialInputs)
+    } else {
+      // For demo purposes, show an alert - in a real app, this might show a subscription upgrade modal
+      alert(`This prompt requires a ${prompt.subscriptionRequired} subscription to access.`)
+    }
   }
 
   const handleInputChange = (inputId, value) => {
@@ -244,13 +264,13 @@ const Prompts = () => {
           <h2 className="text-xl sm:text-2xl font-bold">Select a Platform</h2>
           <div className="flex flex-wrap gap-4 w-full sm:w-auto">
             <button
-              className="relative bg-[#26f4a8] hover:bg-green-400 text-white px-4 py-2 rounded-lg flex items-center"
+              className="relative bg-[#26f4a8] hover:bg-green-400 text-white px-4 py-2 rounded-lg flex gap-1 items-center"
               onClick={() => setShowCreateForm(true)}
               onMouseEnter={() => setIsCreateButtonHovered(true)}
               onMouseLeave={() => setIsCreateButtonHovered(false)}
             >
               <span className="font-medium">Create</span>
-              <Plus className="w-5 h-5 ml-2" />
+              <IoSparklesSharp className="w-5 h-5 ml-2 mt-[2px]" />
             </button>
 
             <div className="relative flex-1 sm:flex-none">
@@ -280,7 +300,9 @@ const Prompts = () => {
                   setSelectedCategory("all") // Reset category when platform changes
                 }}
               >
-                <div className="text-4xl mb-4"><img className="max-h-12" src={platform.icon} alt="" /></div>
+                <div className="text-4xl mb-4">
+                  <img className="max-h-12" src={platform.icon || "/placeholder.svg"} alt="" />
+                </div>
                 <h3 className="font-bold text-lg">{platform.name}</h3>
               </div>
             ))}
@@ -301,7 +323,8 @@ const Prompts = () => {
                 setSelectedPlatform(null)
                 setSelectedCategory("all") // Reset category when going back to platform selection
               }}
-              className="text-xl sm:text-2xl font-bold cursor-pointer">
+              className="text-xl sm:text-2xl font-bold cursor-pointer"
+            >
               {platforms.find((p) => p.id === selectedPlatform)?.name} Prompts
             </h2>
             <button
@@ -354,9 +377,17 @@ const Prompts = () => {
             filteredPrompts.map((prompt) => (
               <div
                 key={prompt.id}
-                className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow cursor-pointer relative"
+                className={`bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow relative ${
+                  prompt.subscriptionRequired ? "" : "cursor-pointer"
+                }`}
                 onClick={() => handlePromptClick(prompt)}
               >
+                {prompt.subscriptionRequired && (
+                  <div className="absolute top-0 right-0 bg-yellow-500 text-white text-xs px-2 py-1 rounded-bl-lg rounded-tr-lg">
+                    {prompt.subscriptionRequired.charAt(0).toUpperCase() + prompt.subscriptionRequired.slice(1)}
+                  </div>
+                )}
+
                 <div className="">
                   <button
                     className={`text-gray-400 hover:text-red-500 ${favorites.includes(prompt.id) ? "text-red-500" : ""}`}
@@ -369,7 +400,10 @@ const Prompts = () => {
                   </button>
                 </div>
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-bold text-lg">{prompt.title}</h3>
+                  <h3 className="font-bold text-lg flex gap-1 items-center">
+                    {prompt.title}
+                    {prompt.subscriptionRequired && <Lock className="w-4 h-4 ml-2 text-yellow-500" />}
+                  </h3>
                   <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mt-1 ml-2">
                     {prompt.category}
                   </span>
@@ -380,10 +414,14 @@ const Prompts = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">{prompt.platform}</span>
                   <button
-                    className="text-[#26f4a8] hover:text-green-400"
+                    className={`text-[#26f4a8] hover:text-green-400 ${prompt.subscriptionRequired ? "opacity-50 cursor-not-allowed" : ""}`}
                     onClick={(e) => {
                       e.stopPropagation()
-                      navigator.clipboard.writeText(prompt.code)
+                      if (!prompt.subscriptionRequired) {
+                        navigator.clipboard.writeText(prompt.code)
+                      } else {
+                        alert("This prompt requires a " + prompt.subscriptionRequired + " subscription to access.")
+                      }
                     }}
                   >
                     <Copy className="w-5 h-5" />
@@ -499,7 +537,6 @@ const Prompts = () => {
                   className={`text-gray-400 hover:text-red-500 ${favorites.includes(selectedPrompt.id) ? "text-red-500" : ""}`}
                   onClick={() => toggleFavorite(selectedPrompt.id)}
                 >
-                  {/* <Heart className="w-5 h-5" fill={favorites.includes(selectedPrompt.id) ? "red" : "none"} /> */}
                 </button>
               </div>
             </div>
@@ -592,7 +629,6 @@ const Prompts = () => {
                   className={`text-gray-400 hover:text-red-500 ${favorites.includes(selectedPrompt.id) ? "text-red-500" : ""}`}
                   onClick={() => toggleFavorite(selectedPrompt.id)}
                 >
-                  {/* <Heart className="w-5 h-5" fill={favorites.includes(selectedPrompt.id) ? "red" : "none"} /> */}
                 </button>
               </div>
             </div>
@@ -674,8 +710,7 @@ const Prompts = () => {
           </div>
         </div>
       )
-    }
-    else if (selectedPrompt.platform === "Gemini") {
+    } else if (selectedPrompt.platform === "Gemini") {
       return (
         <div className="container mx-auto px-4 sm:px-6">
           <button
@@ -697,7 +732,6 @@ const Prompts = () => {
                   className={`text-gray-400 hover:text-red-500 ${favorites.includes(selectedPrompt.id) ? "text-red-500" : ""}`}
                   onClick={() => toggleFavorite(selectedPrompt.id)}
                 >
-                  {/* <Heart className="w-5 h-5" fill={favorites.includes(selectedPrompt.id) ? "red" : "none"} /> */}
                 </button>
               </div>
             </div>

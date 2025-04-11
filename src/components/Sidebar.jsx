@@ -17,6 +17,7 @@ import {
   MessageSquareText,
   Bot,
   LogOut,
+  FilePlus,
 } from "lucide-react"
 
 const Sidebar = ({ isopen, setIsOpen }) => {
@@ -69,14 +70,14 @@ const Sidebar = ({ isopen, setIsOpen }) => {
             <img
               src="https://api.dicebear.com/7.x/adventurer/svg?seed=JohnDoe"
               alt="الصورة الشخصية"
-              className="w-20 h-20 rounded-full border-2 border-[#26f4a8]"
+              className="w-20 h-20 rounded-full border-2 border-green-400"
             />
-            <div className="absolute bottom-0 right-0 bg-[#26f4a8] text-white rounded-full p-1">
+            <div className="absolute bottom-0 right-0 bg-green-400 text-white rounded-full p-1">
               <User className="h-4 w-4" />
             </div>
           </div>
           <h2 className="mt-4 font-bold text-lg">محمد أحمد</h2>
-          <div className="text-sm text-[#26f4a8] font-medium">اشتراك مميز</div>
+          <div className="text-sm text-green-500 font-medium">اشتراك مميز</div>
         </div>
       </div>
 
@@ -100,7 +101,7 @@ const Sidebar = ({ isopen, setIsOpen }) => {
               to="/"
               className={({ isActive }) =>
                 `flex items-center w-full py-3 px-4 rounded-lg transition-colors ${
-                  isActive ? "bg-green-100 text-[#26f4a8]" : "hover:bg-gray-100"
+                  isActive ? "bg-green-100 text-green-500" : "hover:bg-gray-100"
                 }`
               }
               end
@@ -115,7 +116,7 @@ const Sidebar = ({ isopen, setIsOpen }) => {
               to="/prompts"
               className={({ isActive }) =>
                 `flex items-center w-full py-3 px-4 rounded-lg transition-colors ${
-                  isActive ? "bg-green-100 text-[#26f4a8]" : "hover:bg-gray-100"
+                  isActive ? "bg-green-100 text-green-500" : "hover:bg-gray-100"
                 }`
               }
               onClick={handleLinkClick}
@@ -124,12 +125,43 @@ const Sidebar = ({ isopen, setIsOpen }) => {
               <span className="font-medium">المحتوى الجاهز</span>
             </NavLink>
           </li>
+          
+          {/* New UserPrompts Link */}
+          <li>
+            <NavLink
+              to="/user-prompts"
+              className={({ isActive }) =>
+                `flex items-center w-full py-3 px-4 rounded-lg transition-colors ${
+                  isActive ? "bg-green-100 text-green-500" : "hover:bg-gray-100"
+                }`
+              }
+              onClick={handleLinkClick}
+            >
+              <FilePlus className="h-5 w-5 ml-3 text-gray-500" />
+              <span className="font-medium">إعدادات البرومبت</span>
+            </NavLink>
+          </li>
+          
+          <li>
+            <NavLink
+              to="/gpt-assistants"
+              className={({ isActive }) =>
+                `flex items-center w-full py-3 px-4 rounded-lg transition-colors ${
+                  isActive ? "bg-green-100 text-green-500" : "hover:bg-gray-100"
+                }`
+              }
+              onClick={handleLinkClick}
+            >
+              <Bot className="h-5 w-5 ml-3 text-gray-500" />
+              <span className="font-medium">مساعدي GPT</span>
+            </NavLink>
+          </li>
           <li>
             <NavLink
               to="/favorites"
               className={({ isActive }) =>
                 `flex items-center w-full py-3 px-4 rounded-lg transition-colors ${
-                  isActive ? "bg-green-100 text-[#26f4a8]" : "hover:bg-gray-100"
+                  isActive ? "bg-green-100 text-green-500" : "hover:bg-gray-100"
                 }`
               }
               onClick={handleLinkClick}
@@ -143,27 +175,13 @@ const Sidebar = ({ isopen, setIsOpen }) => {
               to="/saved-preferences"
               className={({ isActive }) =>
                 `flex items-center w-full py-3 px-4 rounded-lg transition-colors ${
-                  isActive ? "bg-green-100 text-[#26f4a8]" : "hover:bg-gray-100"
+                  isActive ? "bg-green-100 text-green-500" : "hover:bg-gray-100"
                 }`
               }
               onClick={handleLinkClick}
             >
               <Bookmark className="h-5 w-5 ml-3 text-gray-500" />
               <span className="font-medium">التفضيلات المحفوظة</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/gpt-assistants"
-              className={({ isActive }) =>
-                `flex items-center w-full py-3 px-4 rounded-lg transition-colors ${
-                  isActive ? "bg-green-100 text-[#26f4a8]" : "hover:bg-gray-100"
-                }`
-              }
-              onClick={handleLinkClick}
-            >
-              <Bot className="h-5 w-5 ml-3 text-gray-500" />
-              <span className="font-medium">مساعدي GPT</span>
             </NavLink>
           </li>
         </ul>
@@ -199,11 +217,6 @@ const Sidebar = ({ isopen, setIsOpen }) => {
               <CreditCard className="h-4 w-4 ml-3 text-gray-500" />
               <span className="font-medium">الاشتراك</span>
             </button>
-            {/* <div className="border-t border-gray-200 my-1"></div>
-            <button className="flex items-center w-full py-2 px-4 hover:bg-gray-100 text-right text-red-500">
-              <LogOut className="h-4 w-4 ml-3 text-red-500" />
-              <span className="font-medium">تسجيل الخروج</span>
-            </button> */}
           </div>
         )}
       </div>
