@@ -1,15 +1,22 @@
 "use client"
 
-import { useState } from "react"
-import { Search, Filter, Plus, Copy, ArrowLeft, Heart, Star, Lock } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Search, Filter, Copy, ArrowLeft, Heart, Star, Lock } from "lucide-react"
+import { IoSparklesSharp } from "react-icons/io5"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 import CategoryFilter from "../components/CategoryFilter"
 import chatgpt from "../assets/chatgpt.png"
 import gemini from "../assets/gemini.png"
 import midhourney from "../assets/midjourney.png"
 import claude from "../assets/claude.png"
-import { IoSparklesSharp } from "react-icons/io5"
+import { useNavigate, useLocation } from "react-router-dom"
 
 const Prompts = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+
   const [selectedPrompt, setSelectedPrompt] = useState(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [userInputs, setUserInputs] = useState({})
@@ -19,10 +26,121 @@ const Prompts = () => {
   const [selectedPlatform, setSelectedPlatform] = useState(null)
   const [favorites, setFavorites] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
-  // Add a new state for selected category
   const [selectedCategory, setSelectedCategory] = useState("all")
+  const [userCreatedPrompts, setUserCreatedPrompts] = useState([])
 
-  // Sample data for platforms
+  // Read state from URL on component mount and when URL changes
+  useEffect(() => {
+    const platform = searchParams.get("platform")
+    const promptId = searchParams.get("promptId")
+    const form = searchParams.get("form") === "create"
+
+    if (platform) {
+      setSelectedPlatform(platform)
+    }
+
+    if (form) {
+      setShowCreateForm(true)
+      setSelectedPrompt(null)
+    } else if (promptId) {
+      const prompt = allPrompts.find((p) => p.id.toString() === promptId)
+      if (prompt) {
+        setSelectedPrompt(prompt)
+        setShowCreateForm(false)
+
+        // Initialize inputs for the selected prompt
+        const initialInputs = {}
+        prompt.inputs.forEach((input) => {
+          const preferenceValue = userPreferences[input.id]
+          initialInputs[input.id] = preferenceValue || ""
+        })
+        setUserInputs(initialInputs)
+      }
+    } else if (!platform) {
+      setSelectedPlatform(null)
+      setSelectedPrompt(null)
+      setShowCreateForm(false)
+    } else {
+      setSelectedPrompt(null)
+      setShowCreateForm(false)
+    }
+  }, [location.search])
+
+  // Function to update URL with current state
+  const updateURL = (params) => {
+    const urlParams = new URLSearchParams(location.search)
+
+    // Update or remove parameters
+    if (params.platform) {
+      urlParams.set("platform", params.platform)
+    } else {
+      urlParams.delete("platform")
+    }
+
+    if (params.promptId) {
+      urlParams.set("promptId", params.promptId)
+    } else {
+      urlParams.delete("promptId")
+    }
+
+    if (params.form) {
+      urlParams.set("form", params.form)
+    } else {
+      urlParams.delete("form")
+    }
+
+    // Update the URL without refreshing the page
+    navigate(`${location.pathname}?${urlParams.toString()}`, { replace: true })
+  }
+
+  // Modified handlers to update URL
+  const handleSelectPlatform = (platform) => {
+    setSelectedPlatform(platform)
+    setSelectedCategory("all")
+    updateURL({ platform, promptId: null, form: null })
+  }
+
+  const handlePromptClick = (prompt) => {
+    if (prompt.subscriptionRequired === null) {
+      setSelectedPrompt(prompt)
+      const initialInputs = {}
+      prompt.inputs.forEach((input) => {
+        const preferenceValue = userPreferences[input.id]
+        initialInputs[input.id] = preferenceValue || ""
+      })
+      setUserInputs(initialInputs)
+      updateURL({ platform: selectedPlatform, promptId: prompt.id.toString(), form: null })
+    } else {
+      toast.error(`This prompt requires a ${prompt.subscriptionRequired} subscription to access.`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      })
+    }
+  }
+
+  const handleShowCreateForm = () => {
+    setShowCreateForm(true)
+    updateURL({ platform: selectedPlatform, promptId: null, form: "create" })
+  }
+
+  const handleGoBack = () => {
+    if (selectedPrompt) {
+      setSelectedPrompt(null)
+      updateURL({ platform: selectedPlatform, promptId: null, form: null })
+    } else if (showCreateForm) {
+      setShowCreateForm(false)
+      updateURL({ platform: selectedPlatform, promptId: null, form: null })
+    } else if (selectedPlatform) {
+      setSelectedPlatform(null)
+      setSelectedCategory("all")
+      updateURL({ platform: null, promptId: null, form: null })
+    }
+  }
+
   const platforms = [
     { id: "chatgpt", name: "ChatGPT", icon: chatgpt },
     { id: "claude", name: "Claude", icon: claude },
@@ -30,7 +148,6 @@ const Prompts = () => {
     { id: "gemini", name: "Gemini", icon: gemini },
   ]
 
-  // Sample design styles for MidJourney
   const designStyles = [
     { id: "realistic", name: "Realistic" },
     { id: "cartoon", name: "Cartoon" },
@@ -39,7 +156,38 @@ const Prompts = () => {
     { id: "cyberpunk", name: "Cyberpunk" },
   ]
 
-  // Sample data for prompts with added subscription requirement
+  const userPreferences = {
+    projectName: "Durub AlRiyada",
+    branchCount: "3",
+    businessName: "Fitness Center",
+    newsletterTopic: "Health Tips",
+    productName: "FitTrack Pro",
+    targetMarket: "Saudi Arabia",
+  }
+
+  useEffect(() => {
+    setUserCreatedPrompts([
+      {
+        id: 101,
+        title: "My Custom Marketing Plan",
+        description: "A personalized marketing strategy for my business",
+        category: "Marketing",
+        platform: "ChatGPT",
+        dateCreated: new Date().toISOString(),
+        prompt: "Create a marketing plan for a fitness center focusing on social media and local advertising...",
+      },
+      {
+        id: 102,
+        title: "Product Launch Email",
+        description: "Email template for new product announcements",
+        category: "Email",
+        platform: "Claude",
+        dateCreated: new Date(Date.now() - 86400000).toISOString(),
+        prompt: "Write an email announcing the launch of our new fitness tracking app...",
+      },
+    ])
+  }, [])
+
   const allPrompts = [
     {
       id: 1,
@@ -53,7 +201,7 @@ const Prompts = () => {
         { id: "projectName", label: "Project Name", example: "Durub AlRiyada", type: "text" },
         { id: "branchCount", label: "Number of Branches", example: "3", type: "number" },
       ],
-      subscriptionRequired: "premium", 
+      subscriptionRequired: "premium",
     },
     {
       id: 2,
@@ -66,7 +214,7 @@ const Prompts = () => {
         { id: "productName", label: "Product Name", example: "FitTrack Pro", type: "text" },
         { id: "targetMarket", label: "Target Market", example: "Saudi Arabia", type: "text" },
       ],
-      subscriptionRequired: null, // Added subscription requirement
+      subscriptionRequired: null,
     },
     {
       id: 3,
@@ -79,7 +227,7 @@ const Prompts = () => {
         { id: "industryType", label: "Industry Type", example: "Fitness", type: "text" },
         { id: "topicFocus", label: "Topic Focus", example: "Home Workouts", type: "text" },
       ],
-      subscriptionRequired: null, // Free product
+      subscriptionRequired: null,
     },
     {
       id: 4,
@@ -93,7 +241,7 @@ const Prompts = () => {
         { id: "platformName", label: "Platform Name", example: "Instagram", type: "text" },
         { id: "contentTheme", label: "Content Theme", example: "Fitness Tips", type: "text" },
       ],
-      subscriptionRequired: "premium", // Added subscription requirement
+      subscriptionRequired: "premium",
     },
     {
       id: 5,
@@ -103,7 +251,7 @@ const Prompts = () => {
       platform: "Gemini",
       code: "Write a compelling product description for AirFlex Mat, a Yoga Mat priced at 199 SAR. Focus on benefits, features, and include a call to action.",
       inputs: [],
-      subscriptionRequired: null, // Free product
+      subscriptionRequired: null,
     },
     {
       id: 6,
@@ -116,7 +264,7 @@ const Prompts = () => {
         { id: "businessName", label: "Business Name", example: "Durub AlRiyada", type: "text" },
         { id: "newsletterTopic", label: "Newsletter Topic", example: "Monthly Fitness Challenge", type: "text" },
       ],
-      subscriptionRequired: "basic", // Added subscription requirement
+      subscriptionRequired: "basic",
     },
     {
       id: 7,
@@ -134,7 +282,7 @@ const Prompts = () => {
           options: designStyles.map((style) => style.name),
         },
       ],
-      subscriptionRequired: "premium", // Added subscription requirement
+      subscriptionRequired: "premium",
     },
     {
       id: 8,
@@ -154,7 +302,7 @@ const Prompts = () => {
           options: designStyles.map((style) => style.name),
         },
       ],
-      subscriptionRequired: "premium", // Added subscription requirement
+      subscriptionRequired: "premium",
     },
     {
       id: 9,
@@ -164,22 +312,19 @@ const Prompts = () => {
       platform: "Gemini",
       code: "Create a comprehensive data analysis report for quarterly sales data, including trend analysis, key insights, and visual representation recommendations.",
       inputs: [],
-      subscriptionRequired: null, // Free product
+      subscriptionRequired: null,
     },
   ]
 
-  // Filter prompts based on selected platform
   const prompts = selectedPlatform
     ? allPrompts.filter((prompt) => prompt.platform.toLowerCase() === selectedPlatform.toLowerCase())
     : allPrompts
 
-  // Add a function to get unique categories for the current platform
   const getUniqueCategories = (platformPrompts) => {
     const categories = new Set(platformPrompts.map((prompt) => prompt.category))
     return ["all", ...Array.from(categories)]
   }
 
-  // Update the filteredPrompts to include category filtering
   const filteredPrompts =
     searchQuery || selectedCategory !== "all"
       ? prompts.filter((prompt) => {
@@ -195,27 +340,8 @@ const Prompts = () => {
         })
       : prompts
 
-  // Add a function to handle category selection
   const handleCategoryChange = (category) => {
     setSelectedCategory(category)
-  }
-
-  const handlePromptClick = (prompt) => {
-    // Only allow interaction with free products or products the user has access to
-    // For UI demo purposes, we're just checking if subscriptionRequired is null
-    // In a real app, this would check against the user's actual subscription
-    if (prompt.subscriptionRequired === null) {
-      setSelectedPrompt(prompt)
-      // Initialize inputs
-      const initialInputs = {}
-      prompt.inputs.forEach((input) => {
-        initialInputs[input.id] = ""
-      })
-      setUserInputs(initialInputs)
-    } else {
-      // For demo purposes, show an alert - in a real app, this might show a subscription upgrade modal
-      alert(`This prompt requires a ${prompt.subscriptionRequired} subscription to access.`)
-    }
   }
 
   const handleInputChange = (inputId, value) => {
@@ -238,7 +364,6 @@ const Prompts = () => {
   }
 
   const handleCreatePrompt = () => {
-    // Simulating prompt generation
     setGeneratedPrompt(
       `Generated prompt based on: "${newPromptDescription}"\n\nThis is where the AI-generated prompt would appear. In a real implementation, this would call an API to generate the prompt using ChatGPT.`,
     )
@@ -247,45 +372,93 @@ const Prompts = () => {
   const toggleFavorite = (promptId) => {
     if (favorites.includes(promptId)) {
       setFavorites(favorites.filter((id) => id !== promptId))
+      toast.info("The prompt has been removed from your favorites.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      })
     } else {
       setFavorites([...favorites, promptId])
+      toast.success("The prompt has been added to your favorites.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      })
     }
   }
 
   const handleSavePrompt = () => {
-    alert("Prompt saved to your profile!")
+    toast.success("The prompt has been saved to your profile.", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    })
+
+    const newPrompt = {
+      id: Date.now(),
+      title: "New Custom Prompt",
+      description: newPromptDescription.substring(0, 100) + (newPromptDescription.length > 100 ? "..." : ""),
+      category: "Custom",
+      platform: selectedPlatform || "ChatGPT",
+      dateCreated: new Date().toISOString(),
+      prompt: generatedPrompt,
+    }
+
+    setUserCreatedPrompts([newPrompt, ...userCreatedPrompts])
+    setShowCreateForm(false)
+    updateURL({ platform: selectedPlatform, promptId: null, form: null })
   }
 
-  // Render platform selection view
+  const SearchBar = () => (
+    <div className="flex flex-col sm:flex-row gap-4 w-full">
+      <div className="flex gap-4 w-full sm:w-auto">
+        <button
+          className="relative bg-[#26f4a8] hover:bg-green-400 text-white px-4 py-2 rounded-lg flex items-center"
+          onClick={handleShowCreateForm}
+        >
+          <span className="font-medium">Create</span>
+          <IoSparklesSharp className="w-5 h-5 ml-2 mt-[2px]" />
+        </button>
+
+        <button className="bg-gray-200 hover:bg-gray-300 p-2 rounded-lg sm:hidden">
+          <Filter className="w-5 h-5 text-gray-600" />
+        </button>
+      </div>
+
+      <div className="relative w-full">
+        <Search className="absolute right-3 top-3 text-gray-400 w-5 h-5" />
+        <input
+          type="text"
+          placeholder="Search prompts..."
+          className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#26f4a8]"
+          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchQuery}
+        />
+      </div>
+
+      <button className="bg-gray-200 hover:bg-gray-300 p-2 rounded-lg hidden sm:block">
+        <Filter className="w-5 h-5 text-gray-600" />
+      </button>
+    </div>
+  )
+
   if (!selectedPlatform && !selectedPrompt && !showCreateForm) {
     return (
       <div className="container mx-auto md:px-4 sm:px-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <ToastContainer className={"z-50"} rtl />
+        <div className="flex flex-col gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-bold">Select a Platform</h2>
-          <div className="flex flex-wrap gap-4 w-full sm:w-auto">
-            <button
-              className="relative bg-[#26f4a8] hover:bg-green-400 text-white px-4 py-2 rounded-lg flex gap-1 items-center"
-              onClick={() => setShowCreateForm(true)}
-              onMouseEnter={() => setIsCreateButtonHovered(true)}
-              onMouseLeave={() => setIsCreateButtonHovered(false)}
-            >
-              <span className="font-medium">Create</span>
-              <IoSparklesSharp className="w-5 h-5 ml-2 mt-[2px]" />
-            </button>
-
-            <div className="relative flex-1 sm:flex-none">
-              <Search className="absolute right-3 top-3 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search prompts..."
-                className="w-full sm:w-auto pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#26f4a8]"
-                onChange={(e) => setSearchQuery(e.target.value)}
-                value={searchQuery}
-              />
-            </div>
-            <button className="bg-gray-200 hover:bg-gray-300 p-2 rounded-lg">
-              <Filter className="w-5 h-5 text-gray-600" />
-            </button>
+          <div className="w-full">
+            <SearchBar />
           </div>
         </div>
 
@@ -295,13 +468,14 @@ const Prompts = () => {
               <div
                 key={platform.id}
                 className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer flex flex-col items-center"
-                onClick={() => {
-                  setSelectedPlatform(platform.id)
-                  setSelectedCategory("all") // Reset category when platform changes
-                }}
+                onClick={() => handleSelectPlatform(platform.id)}
               >
                 <div className="text-4xl mb-4">
-                  <img className="max-h-12" src={platform.icon || "/placeholder.svg"} alt="" />
+                  <img
+                    className="max-h-12"
+                    src={platform.icon || "/placeholder.svg?height=48&width=48"}
+                    alt={platform.name}
+                  />
                 </div>
                 <h3 className="font-bold text-lg">{platform.name}</h3>
               </div>
@@ -312,56 +486,20 @@ const Prompts = () => {
     )
   }
 
-  // Render prompts list when a platform is selected but no prompt is selected
   if (selectedPlatform && !selectedPrompt && !showCreateForm) {
     return (
       <div className="container mx-auto px-4 sm:px-6">
+        <ToastContainer rtl />
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <div className="flex items-center">
-            <h2
-              onClick={() => {
-                setSelectedPlatform(null)
-                setSelectedCategory("all") // Reset category when going back to platform selection
-              }}
-              className="text-xl sm:text-2xl font-bold cursor-pointer"
-            >
+          <div className="flex gap-2 items-center">
+            <button onClick={handleGoBack} className="text-gray-600 hover:text-gray-800 mr-3">
+              <ArrowLeft className="w-5 h-5 mt-[2px]" />
+            </button>
+            <h2 onClick={handleGoBack} className="text-xl cursor-pointer text-nowrap sm:text-2xl font-bold">
               {platforms.find((p) => p.id === selectedPlatform)?.name} Prompts
             </h2>
-            <button
-              onClick={() => {
-                setSelectedPlatform(null)
-                setSelectedCategory("all") // Reset category when going back to platform selection
-              }}
-              className="text-gray-600 hover:text-gray-800 mr-3"
-            >
-              <ArrowLeft className="w-5 h-5 mt-[4px]" />
-            </button>
           </div>
-          <div className="flex flex-wrap gap-4 w-full sm:w-auto">
-            <button
-              className="relative bg-[#26f4a8] hover:bg-green-400 text-white px-4 py-2 rounded-lg flex items-center"
-              onClick={() => setShowCreateForm(true)}
-              onMouseEnter={() => setIsCreateButtonHovered(true)}
-              onMouseLeave={() => setIsCreateButtonHovered(false)}
-            >
-              <span className="font-medium">Create</span>
-              <Plus className="w-5 h-5 ml-2" />
-            </button>
-
-            <div className="relative flex-1 sm:flex-none">
-              <Search className="absolute right-3 top-3 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search prompts..."
-                className="w-full sm:w-auto pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#26f4a8]"
-                onChange={(e) => setSearchQuery(e.target.value)}
-                value={searchQuery}
-              />
-            </div>
-            <button className="bg-gray-200 hover:bg-gray-300 p-2 rounded-lg">
-              <Filter className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
+          <SearchBar />
         </div>
 
         {filteredPrompts.length > 0 && (
@@ -419,8 +557,23 @@ const Prompts = () => {
                       e.stopPropagation()
                       if (!prompt.subscriptionRequired) {
                         navigator.clipboard.writeText(prompt.code)
+                        toast.success("The prompt has been copied to your clipboard.", {
+                          position: "top-right",
+                          autoClose: 3000,
+                          hideProgressBar: false,
+                          closeOnClick: true,
+                          pauseOnHover: true,
+                          draggable: true,
+                        })
                       } else {
-                        alert("This prompt requires a " + prompt.subscriptionRequired + " subscription to access.")
+                        toast.error(`This prompt requires a ${prompt.subscriptionRequired} subscription to access.`, {
+                          position: "top-right",
+                          autoClose: 3000,
+                          hideProgressBar: false,
+                          closeOnClick: true,
+                          pauseOnHover: true,
+                          draggable: true,
+                        })
                       }
                     }}
                   >
@@ -439,16 +592,16 @@ const Prompts = () => {
     )
   }
 
-  // Render create prompt form
   if (showCreateForm) {
     return (
       <div className="container mx-auto px-4 sm:px-6">
+        <ToastContainer rtl />
         <button
-          onClick={() => setShowCreateForm(false)}
-          className="flex items-center text-gray-600 hover:text-gray-800 mb-6 cursor-pointer"
+          onClick={handleGoBack}
+          className="flex items-center cursor-pointer text-gray-600 hover:text-gray-800 mb-6"
         >
+          <ArrowLeft className="w-5 h-5 mr-2" />
           Back to prompts
-          <ArrowLeft className="w-5 h-5 mr-2 mt-[2px] cursor-pointer" />
         </button>
 
         <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
@@ -479,30 +632,30 @@ const Prompts = () => {
                 <pre className="whitespace-pre-wrap">{generatedPrompt}</pre>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-gray-700 mb-2">Prompt Title</label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#26f4a8]"
-                    placeholder="Enter a title for your prompt"
-                  />
+              {userCreatedPrompts.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="font-semibold text-lg mb-3">Your Previous Prompts</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {userCreatedPrompts.map((prompt) => (
+                      <div key={prompt.id} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        <h4 className="font-medium">{prompt.title}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{prompt.description}</p>
+                        <div className="flex justify-between items-center mt-2">
+                          <span className="text-xs text-gray-500">
+                            {new Date(prompt.dateCreated).toLocaleDateString()}
+                          </span>
+                          <span className="bg-green-100 text-xs px-2 py-1 rounded-full">{prompt.platform}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-gray-700 mb-2">Category</label>
-                  <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#26f4a8]">
-                    <option value="">Select category</option>
-                    <option value="Business">Business</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="SEO">SEO</option>
-                    <option value="Content">Content</option>
-                    <option value="E-commerce">E-commerce</option>
-                    <option value="Email">Email</option>
-                  </select>
-                </div>
-              </div>
+              )}
 
-              <button className="mt-4 bg-[#26f4a8] hover:bg-green-400 text-white px-6 py-2 rounded-lg">
+              <button
+                className="mt-4 bg-[#26f4a8] hover:bg-green-400 text-white px-6 py-2 rounded-lg"
+                onClick={handleSavePrompt}
+              >
                 Save Prompt
               </button>
             </div>
@@ -512,18 +665,17 @@ const Prompts = () => {
     )
   }
 
-  // Render detailed prompt view based on platform
   if (selectedPrompt) {
-    // ChatGPT and Claude view (with input fields)
     if (selectedPrompt.platform === "ChatGPT" || selectedPrompt.platform === "Claude") {
       return (
         <div className="container mx-auto px-4 sm:px-6">
+          <ToastContainer rtl />
           <button
-            onClick={() => setSelectedPrompt(null)}
-            className="flex items-center text-gray-600 hover:text-gray-800 mb-6 cursor-pointer"
+            onClick={handleGoBack}
+            className="flex items-center cursor-pointer text-gray-600 hover:text-gray-800 mb-6"
           >
+            <ArrowLeft className="w-5 h-5 cursor-pointer mr-2" />
             Back to prompts
-            <ArrowLeft className="w-5 h-5 mr-2 mt-[2px] cursor-pointer" />
           </button>
 
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
@@ -533,11 +685,7 @@ const Prompts = () => {
                 <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mr-2">
                   {selectedPrompt.category}
                 </span>
-                <button
-                  className={`text-gray-400 hover:text-red-500 ${favorites.includes(selectedPrompt.id) ? "text-red-500" : ""}`}
-                  onClick={() => toggleFavorite(selectedPrompt.id)}
-                >
-                </button>
+                
               </div>
             </div>
 
@@ -556,7 +704,7 @@ const Prompts = () => {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#26f4a8]"
                       >
                         <option value="">Select {input.label}</option>
-                        {input.options.map((option, index) => (
+                        {input.options?.map((option, index) => (
                           <option key={index} value={option}>
                             {option}
                           </option>
@@ -583,7 +731,17 @@ const Prompts = () => {
                   <span className="mr-2 text-sm text-gray-500">{selectedPrompt.platform}</span>
                   <button
                     className="text-[#26f4a8] hover:bg-green-400 flex items-center mr-2"
-                    onClick={() => navigator.clipboard.writeText(getFormattedPromptCode())}
+                    onClick={() => {
+                      navigator.clipboard.writeText(getFormattedPromptCode())
+                      toast.success("The prompt has been copied to your clipboard.", {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                      })
+                    }}
                   >
                     <Copy className="w-5 h-5 mr-1" />
                     Copy
@@ -604,18 +762,16 @@ const Prompts = () => {
           </div>
         </div>
       )
-    }
-
-    // MidJourney view (with style selection and sample image)
-    else if (selectedPrompt.platform === "MidJourney") {
+    } else if (selectedPrompt.platform === "MidJourney") {
       return (
         <div className="container mx-auto px-4 sm:px-6">
+          <ToastContainer rtl />
           <button
-            onClick={() => setSelectedPrompt(null)}
-            className="flex items-center text-gray-600 hover:text-gray-800 mb-6 cursor-pointer"
+            onClick={handleGoBack}
+            className="flex items-center cursor-pointer text-gray-600 hover:text-gray-800 mb-6"
           >
+            <ArrowLeft className="w-5 h-5 cursor-pointer mr-2" />
             Back to prompts
-            <ArrowLeft className="w-5 h-5 mr-2 mt-[2px] cursor-pointer" />
           </button>
 
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
@@ -625,11 +781,7 @@ const Prompts = () => {
                 <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mr-2">
                   {selectedPrompt.category}
                 </span>
-                <button
-                  className={`text-gray-400 hover:text-red-500 ${favorites.includes(selectedPrompt.id) ? "text-red-500" : ""}`}
-                  onClick={() => toggleFavorite(selectedPrompt.id)}
-                >
-                </button>
+                
               </div>
             </div>
 
@@ -648,7 +800,7 @@ const Prompts = () => {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#26f4a8]"
                       >
                         <option value="">Select {input.label}</option>
-                        {input.options.map((option, index) => (
+                        {input.options?.map((option, index) => (
                           <option key={index} value={option}>
                             {option}
                           </option>
@@ -673,7 +825,7 @@ const Prompts = () => {
                 <h3 className="font-semibold text-lg mb-3">Style Preview</h3>
                 <div className="bg-gray-100 rounded-lg overflow-hidden">
                   <img
-                    src="/api/placeholder/600/400"
+                    src="/placeholder.svg?height=400&width=600"
                     alt={`${userInputs.style} style example`}
                     className="w-full object-cover"
                   />
@@ -689,7 +841,17 @@ const Prompts = () => {
                   <span className="mr-2 text-sm text-gray-500">{selectedPrompt.platform}</span>
                   <button
                     className="text-[#26f4a8] hover:bg-green-400 flex items-center mr-2"
-                    onClick={() => navigator.clipboard.writeText(getFormattedPromptCode())}
+                    onClick={() => {
+                      navigator.clipboard.writeText(getFormattedPromptCode())
+                      toast.success("The prompt has been copied to your clipboard.", {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                      })
+                    }}
                   >
                     <Copy className="w-5 h-5 mr-1" />
                     Copy
@@ -713,12 +875,13 @@ const Prompts = () => {
     } else if (selectedPrompt.platform === "Gemini") {
       return (
         <div className="container mx-auto px-4 sm:px-6">
+          <ToastContainer className={"z-50"} rtl />
           <button
-            onClick={() => setSelectedPrompt(null)}
-            className="flex items-center text-gray-600 hover:text-gray-800 mb-6 cursor-pointer"
+            onClick={handleGoBack}
+            className="flex items-center cursor-pointer text-gray-600 hover:text-gray-800 mb-6"
           >
+            <ArrowLeft className="w-5 h-5 cursor-pointer mr-2" />
             Back to prompts
-            <ArrowLeft className="w-5 h-5 mr-2 mt-[2px] cursor-pointer" />
           </button>
 
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
@@ -728,11 +891,6 @@ const Prompts = () => {
                 <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mr-2">
                   {selectedPrompt.category}
                 </span>
-                <button
-                  className={`text-gray-400 hover:text-red-500 ${favorites.includes(selectedPrompt.id) ? "text-red-500" : ""}`}
-                  onClick={() => toggleFavorite(selectedPrompt.id)}
-                >
-                </button>
               </div>
             </div>
 
@@ -745,7 +903,17 @@ const Prompts = () => {
                   <span className="mr-2 text-sm text-gray-500">{selectedPrompt.platform}</span>
                   <button
                     className="text-[#26f4a8] hover:bg-green-400 flex items-center mr-2"
-                    onClick={() => navigator.clipboard.writeText(selectedPrompt.code)}
+                    onClick={() => {
+                      navigator.clipboard.writeText(selectedPrompt.code)
+                      toast.success("The prompt has been copied to your clipboard.", {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                      })
+                    }}
                   >
                     <Copy className="w-5 h-5 mr-1" />
                     Copy

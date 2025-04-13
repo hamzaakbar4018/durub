@@ -1,12 +1,15 @@
+"use client"
+
 import { useState } from "react"
-import { Search, Filter, Copy, Edit, Trash2, Bookmark, Play, Tag } from "lucide-react"
+import { Search, Filter, Copy, Edit, Trash2, Bookmark, Play, Tag } from 'lucide-react'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const SavedPreferences = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedPlatform, setSelectedPlatform] = useState("all")
 
-  // Sample data for saved preferences
   const savedPreferences = [
     {
       id: 1,
@@ -62,11 +65,9 @@ const SavedPreferences = () => {
     },
   ]
 
-  // Get unique categories and platforms for filters
   const categories = ["all", ...new Set(savedPreferences.map((pref) => pref.category))]
   const platforms = ["all", ...new Set(savedPreferences.map((pref) => pref.platform))]
 
-  // Filter preferences based on search query, category, and platform
   const filteredPreferences = savedPreferences.filter((pref) => {
     const matchesSearch =
       searchQuery === "" ||
@@ -80,34 +81,64 @@ const SavedPreferences = () => {
   })
 
   const handleDeletePreference = (id) => {
-    alert(`Deleted preference ${id}`)
+    toast.success(`Preference ${id} has been deleted.`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    })
   }
 
   const handleEditPreference = (id) => {
-    alert(`Edit preference ${id}`)
+    toast.info(`Editing preference ${id}.`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    })
   }
 
   const handleUsePreference = (preference) => {
-    alert(`Using preference: ${preference.title}`)
+    toast.success(`Using preference: ${preference.title}`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    })
   }
 
   const handleCopyPrompt = (prompt) => {
     navigator.clipboard.writeText(prompt)
-    alert("Prompt copied to clipboard!")
+    toast.success("The prompt has been copied to your clipboard.", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    })
   }
 
-  // Function to format inputs as a readable string
   const formatInputs = (inputs) => {
     return Object.entries(inputs)
-      .map(([key, value]) => `${key}: ${value}`)
+      .map(([key, value]) => {
+        const formattedKey = key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())
+        return `${formattedKey}: ${value}`
+      })
       .join(", ")
   }
 
   return (
     <div className="container mx-auto md:px-4 sm:px-6 py-8 rtl">
+      <ToastContainer rtl />
       <h1 className="text-2xl sm:text-3xl font-bold mb-6">التفضيلات المحفوظة</h1>
 
-      {/* Search and filters */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div className="flex flex-wrap gap-4 w-full">
           <div className="relative flex-1">
@@ -153,7 +184,6 @@ const SavedPreferences = () => {
         </div>
       </div>
 
-      {/* Saved preferences list */}
       {filteredPreferences.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPreferences.map((preference) => (
@@ -211,13 +241,7 @@ const SavedPreferences = () => {
                   >
                     <Copy className="w-5 h-5" />
                   </button>
-                  {/* <button
-                    className="bg-[#26f4a8] text-white p-1 rounded-md hover:bg-green-400"
-                    onClick={() => handleUsePreference(preference)}
-                    title="استخدام"
-                  >
-                    <Play className="w-4 h-4" />
-                  </button> */}
+                  
                 </div>
               </div>
             </div>

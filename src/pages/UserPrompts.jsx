@@ -93,7 +93,7 @@ const UserPrompts = () => {
 
   const toggleFavorite = (e, promptId) => {
     e.stopPropagation()
-    setFavorites(favorites.includes(promptId) 
+    setFavorites(favorites.includes(promptId)
       ? favorites.filter(id => id !== promptId)
       : [...favorites, promptId]
     )
@@ -115,16 +115,16 @@ const UserPrompts = () => {
 
   const handleUpdatePrompt = (e) => {
     e.preventDefault()
-    const updatedPrompts = userPrompts.map((prompt) => 
+    const updatedPrompts = userPrompts.map((prompt) =>
       prompt.id === editPromptData.id ? editPromptData : prompt
     )
-    
+
     setUserPrompts(updatedPrompts)
-    
+
     if (selectedPrompt && selectedPrompt.id === editPromptData.id) {
       setSelectedPrompt(editPromptData)
     }
-    
+
     setShowEditForm(false)
     setEditPromptData(null)
   }
@@ -144,7 +144,7 @@ const UserPrompts = () => {
     setEditPromptData({
       ...editPromptData,
       inputs: [
-        ...editPromptData.inputs, 
+        ...editPromptData.inputs,
         { id: `input_${Date.now()}`, label: "", example: "", type: "text" }
       ]
     })
@@ -307,8 +307,8 @@ const UserPrompts = () => {
               >
                 Cancel
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="bg-green-400 hover:bg-green-500 text-white px-6 py-2 rounded-lg"
               >
                 Save Changes
@@ -400,26 +400,25 @@ const UserPrompts = () => {
     )
   }
 
-  // Render prompts list
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <div className="flex flex-col gap-4 mb-6">
         <h1 className="text-2xl font-bold">My Prompts</h1>
-        <div className="flex flex-wrap gap-4 w-full sm:w-auto">
-          
 
-          <div className="relative flex-1 sm:flex-none">
+        <div className="flex flex-col sm:flex-row gap-4 w-full">
+          <div className="relative w-full">
             <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
             <input
               type="text"
               placeholder="Search your prompts..."
-              className="w-full sm:w-auto pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               onChange={(e) => setSearchQuery(e.target.value)}
               value={searchQuery}
             />
           </div>
+
           <select
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 sm:w-auto w-full"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
