@@ -72,7 +72,7 @@ const Layout = () => {
             <button id="sidebar-toggle" onClick={toggleSidebar} className="p-2 rounded-md hover:bg-gray-200">
               {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
-            <h1 className="text-xl font-semibold text-gray-800">Durub Alriyada</h1>
+            {/* <h1 className="text-xl font-semibold text-gray-800">Durub Alriyada</h1> */}
             <div className="w-6"></div> {/* Placeholder for symmetry */}
           </div>
         </header>

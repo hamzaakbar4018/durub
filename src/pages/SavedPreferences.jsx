@@ -1,14 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Filter, Copy, Edit, Trash2, Bookmark, Play, Tag } from 'lucide-react'
-import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { Search, Filter, Copy, Edit, Trash2, Bookmark, Tag } from "lucide-react"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 const SavedPreferences = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedPlatform, setSelectedPlatform] = useState("all")
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [currentPreference, setCurrentPreference] = useState(null)
+  const [editedInputs, setEditedInputs] = useState({})
 
   const savedPreferences = [
     {
@@ -126,12 +129,36 @@ const SavedPreferences = () => {
   }
 
   const formatInputs = (inputs) => {
-    return Object.entries(inputs)
-      .map(([key, value]) => {
-        const formattedKey = key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())
-        return `${formattedKey}: ${value}`
-      })
-      .join(", ")
+    return Object.entries(inputs).map(([key, value]) => {
+      const formattedKey = key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())
+      return { key, label: formattedKey, value }
+    })
+  }
+
+  const handleSaveEdits = () => {
+    // In a real app, you would update the database here
+    toast.success(`Preference inputs updated successfully.`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    })
+    setIsEditModalOpen(false)
+  }
+
+  const openEditModal = (preference) => {
+    setCurrentPreference(preference)
+    setEditedInputs({ ...preference.inputs })
+    setIsEditModalOpen(true)
+  }
+
+  const handleInputChange = (key, value) => {
+    setEditedInputs((prev) => ({
+      ...prev,
+      [key]: value,
+    }))
   }
 
   return (
@@ -193,23 +220,30 @@ const SavedPreferences = () => {
             >
               <div className="flex justify-between items-start mb-2">
                 <h3 className="font-bold text-lg">{preference.title}</h3>
-                <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mt-1 ml-2">
+                {/* <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mt-1 ml-2">
                   {preference.category}
-                </span>
+                </span> */}
               </div>
 
               <p className="text-gray-600 mb-3">{preference.description}</p>
 
               <div className="bg-gray-50 p-3 rounded-md mb-4 text-sm">
-                <div className="font-semibold mb-1">المدخلات:</div>
-                <div className="text-gray-600">{formatInputs(preference.inputs)}</div>
+                <div className="font-semibold mb-2">المدخلات:</div>
+                <div className="space-y-2">
+                  {formatInputs(preference.inputs).map((input) => (
+                    <div key={input.key} className="flex justify-between items-center">
+                      <span className="text-gray-700 font-medium">{input.label}:</span>
+                      <span className="text-gray-600">{input.value}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="flex justify-between items-center mb-3">
-                <div className="flex gap-2 items-center">
+                {/* <div className="flex gap-2 items-center">
                   <Tag className="w-4 h-4 mr-1 text-gray-500" />
                   <span className="text-sm text-gray-500">{preference.platform}</span>
-                </div>
+                </div> */}
                 <span className="text-xs text-gray-400">
                   {new Date(preference.dateCreated).toLocaleDateString("ar-SA")}
                 </span>
@@ -219,21 +253,21 @@ const SavedPreferences = () => {
                 <div className="flex gap-2">
                   <button
                     className="text-gray-500 hover:text-gray-700"
-                    onClick={() => handleEditPreference(preference.id)}
+                    onClick={() => openEditModal(preference)}
                     title="تعديل"
                   >
                     <Edit className="w-5 h-5" />
                   </button>
-                  <button
+                  {/* <button
                     className="text-gray-500 hover:text-red-500"
                     onClick={() => handleDeletePreference(preference.id)}
                     title="حذف"
                   >
                     <Trash2 className="w-5 h-5" />
-                  </button>
+                  </button> */}
                 </div>
 
-                <div className="flex gap-2">
+                {/* <div className="flex gap-2">
                   <button
                     className="text-[#26f4a8] hover:text-green-400"
                     onClick={() => handleCopyPrompt(preference.prompt)}
@@ -241,8 +275,7 @@ const SavedPreferences = () => {
                   >
                     <Copy className="w-5 h-5" />
                   </button>
-                  
-                </div>
+                </div> */}
               </div>
             </div>
           ))}
@@ -252,6 +285,43 @@ const SavedPreferences = () => {
           <Bookmark className="w-16 h-16 mx-auto text-gray-300 mb-4" />
           <h3 className="text-xl font-semibold text-gray-700 mb-2">لا توجد تفضيلات محفوظة</h3>
           <p className="text-gray-500">لم تقم بحفظ أي تفضيلات بعد. يمكنك حفظ التفضيلات عند استخدام المحتوى.</p>
+        </div>
+      )}
+      {isEditModalOpen && currentPreference && (
+        <div style={{ backdropFilter: 'blur(2px)' }} className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h2 className="text-xl font-bold mb-4">تعديل المدخلات</h2>
+            <div className="space-y-4 mb-6">
+              {formatInputs(currentPreference.inputs).map((input) => (
+                <div key={input.key} className="grid gap-2">
+                  <label htmlFor={input.key} className="font-medium">
+                    {input.label}
+                  </label>
+                  <input
+                    id={input.key}
+                    type="text"
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#26f4a8]"
+                    value={editedInputs[input.key] || ""}
+                    onChange={(e) => handleInputChange(input.key, e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg"
+                onClick={() => setIsEditModalOpen(false)}
+              >
+                إلغاء
+              </button>
+              <button
+                className="px-4 py-2 bg-[#26f4a8] hover:bg-[#1ee69a] text-white rounded-lg"
+                onClick={handleSaveEdits}
+              >
+                حفظ التغييرات
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

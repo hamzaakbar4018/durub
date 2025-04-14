@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const CategoryFilter = ({ categories, selectedCategory, onSelectCategory }) => {
   const scrollContainerRef = useRef(null);
@@ -58,7 +58,7 @@ const CategoryFilter = ({ categories, selectedCategory, onSelectCategory }) => {
 
       <div
         ref={scrollContainerRef}
-        className="flex space-x-2 pb-2 overflow-x-auto scrollbar-hide px-2"
+        className="flex pb-2 overflow-x-auto scrollbar-hide"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {categories.map((category) => (

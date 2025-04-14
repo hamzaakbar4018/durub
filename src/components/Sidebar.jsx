@@ -411,7 +411,7 @@ const Sidebar = ({ isopen, setIsOpen }) => {
         </nav>
 
         <div className="">
-          <ul className="p-2">
+          <ul className="p-2 border-t border-gray-200">
            
             <li>
               <NavLink
@@ -442,7 +442,7 @@ const Sidebar = ({ isopen, setIsOpen }) => {
           </ul>
         </div>
 
-        <div id="settings-section" className="p-4 border-t border-gray-200 relative">
+        <div id="settings-section" className="px-2 pb-4  relative">
           <button
             onClick={toggleSetting}
             className="flex items-center w-full py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors"

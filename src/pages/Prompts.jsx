@@ -328,16 +328,16 @@ const Prompts = () => {
   const filteredPrompts =
     searchQuery || selectedCategory !== "all"
       ? prompts.filter((prompt) => {
-          const matchesSearch =
-            searchQuery === "" ||
-            prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            prompt.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            prompt.category.toLowerCase().includes(searchQuery.toLowerCase())
+        const matchesSearch =
+          searchQuery === "" ||
+          prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          prompt.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          prompt.category.toLowerCase().includes(searchQuery.toLowerCase())
 
-          const matchesCategory = selectedCategory === "all" || prompt.category === selectedCategory
+        const matchesCategory = selectedCategory === "all" || prompt.category === selectedCategory
 
-          return matchesSearch && matchesCategory
-        })
+        return matchesSearch && matchesCategory
+      })
       : prompts
 
   const handleCategoryChange = (category) => {
@@ -488,8 +488,8 @@ const Prompts = () => {
 
   if (selectedPlatform && !selectedPrompt && !showCreateForm) {
     return (
-      <div className="container mx-auto px-4 sm:px-6">
-        <ToastContainer rtl />
+      <div className={`container mx-auto px-4 sm:px-6 `}>
+        <ToastContainer rtl className={'z-50'} />
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div className="flex gap-2 items-center">
             <button onClick={handleGoBack} className="text-gray-600 hover:text-gray-800 mr-3">
@@ -503,25 +503,25 @@ const Prompts = () => {
         </div>
 
         {filteredPrompts.length > 0 && (
-          <CategoryFilter
-            categories={getUniqueCategories(prompts)}
-            selectedCategory={selectedCategory}
-            onSelectCategory={handleCategoryChange}
-          />
+            <CategoryFilter
+              categories={getUniqueCategories(prompts)}
+              selectedCategory={selectedCategory}
+              onSelectCategory={handleCategoryChange}
+            />
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 }`}>
+
           {filteredPrompts.length > 0 ? (
             filteredPrompts.map((prompt) => (
               <div
                 key={prompt.id}
-                className={`bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow relative ${
-                  prompt.subscriptionRequired ? "" : "cursor-pointer"
-                }`}
+                className={`bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow relative ${prompt.subscriptionRequired ? "" : "cursor-pointer"
+                  }`}
                 onClick={() => handlePromptClick(prompt)}
               >
                 {prompt.subscriptionRequired && (
-                  <div className="absolute top-0 right-0 bg-yellow-500 text-white text-xs px-2 py-1 rounded-bl-lg rounded-tr-lg">
+                  <div className="absolute top-0 left-0 bg-yellow-500 text-white text-xs px-2 py-1 rounded-br-lg rounded-tl-lg">
                     {prompt.subscriptionRequired.charAt(0).toUpperCase() + prompt.subscriptionRequired.slice(1)}
                   </div>
                 )}
@@ -685,7 +685,7 @@ const Prompts = () => {
                 <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mr-2">
                   {selectedPrompt.category}
                 </span>
-                
+
               </div>
             </div>
 
@@ -781,7 +781,7 @@ const Prompts = () => {
                 <span className="bg-green-100 text-black text-xs px-2 py-1 rounded-full mr-2">
                   {selectedPrompt.category}
                 </span>
-                
+
               </div>
             </div>
 
