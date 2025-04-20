@@ -4,3 +4,14 @@
 /* *{
     outline: 1px solid red;
 } */
+
+@font-face {
+  font-family: 'SF Pro';
+  src: url('/fonts/SFPRODISPLAYREGULAR.OTF') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: 'SF Pro', sans-serif;
+}
